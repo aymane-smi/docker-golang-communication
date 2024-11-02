@@ -1,6 +1,7 @@
 package service
 
 import (
+	"aymane/utils"
 	"bytes"
 	"context"
 	"fmt"
@@ -12,8 +13,14 @@ import (
 )
 
 func DockerWriter(ctx context.Context, clt *client.Client) bytes.Buffer {
+	tarFile, err := utils.CreateTar("test.js", "function hello(name){console.log('hello from '+name)};hello('aymane');")
+	if err := clt.CopyToContainer(ctx, "goofy_rubin", "/tmp", tarFile, types.CopyToContainerOptions{}); err != nil {
+		panic(err)
+	}
+	//add, err := clt.CopyToContainer()
 	exec, err := clt.ContainerExecCreate(ctx, "goofy_rubin", types.ExecConfig{
-		Cmd:          []string{"node", "-e", "console.log('hello', typeof 1)"},
+		// save this command later for the testing "node", "-e", "console.log('hello', typeof 1)"
+		Cmd:          []string{"node", "/tmp/test.js"},
 		AttachStdin:  true,
 		AttachStdout: true,
 	})
