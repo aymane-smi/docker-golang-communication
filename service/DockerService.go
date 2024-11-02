@@ -1,6 +1,7 @@
 package service
 
 import (
+	t "aymane/types"
 	"aymane/utils"
 	"bytes"
 	"context"
@@ -13,7 +14,10 @@ import (
 )
 
 func DockerWriter(ctx context.Context, clt *client.Client) bytes.Buffer {
-	tarFile, err := utils.CreateTar("test.js", "function hello(name){console.log('hello from '+name)};hello('aymane');")
+	cases := []t.Cases{
+		{Input: []int{1, 2}, Expected: 3},
+	}
+	tarFile, err := utils.CreateTar("test.js", utils.InitTemplateJS("function sum(a,b){return a+b}", "sum", cases))
 	if err := clt.CopyToContainer(ctx, "goofy_rubin", "/tmp", tarFile, types.CopyToContainerOptions{}); err != nil {
 		panic(err)
 	}
@@ -71,4 +75,8 @@ func DockerWriter(ctx context.Context, clt *client.Client) bytes.Buffer {
 		panic("error during the execution")
 	}
 	return output
+}
+
+func CreateContainers() {
+
 }
