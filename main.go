@@ -17,6 +17,6 @@ func main() {
 		panic(err)
 	}
 	defer clt.Close()
-	r.HandleFunc("/docker", controller.Handler(ctx, clt))
+	r.HandleFunc("/docker", controller.Handler(ctx, clt)).Methods("POST")
 	http.ListenAndServe(":8008", r)
 }

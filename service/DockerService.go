@@ -13,18 +13,18 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 )
 
-func DockerWriter(ctx context.Context, clt *client.Client) bytes.Buffer {
+func DockerWriter(ctx context.Context, clt *client.Client, language string) bytes.Buffer {
 	cases := []t.Cases{
 		{Input: []int{1, 2}, Expected: 3},
 	}
 	tarFile, err := utils.CreateTar("test.php", utils.InitTemplatePhp("function sum($a,$b){return $a+$b;}", "sum", cases))
-	if err := clt.CopyToContainer(ctx, "php", "/tmp", tarFile, types.CopyToContainerOptions{}); err != nil {
+	if err := clt.CopyToContainer(ctx, language, "/tmp", tarFile, types.CopyToContainerOptions{}); err != nil {
 		panic(err)
 	}
 	//add, err := clt.CopyToContainer()
-	exec, err := clt.ContainerExecCreate(ctx, "php", types.ExecConfig{
+	exec, err := clt.ContainerExecCreate(ctx, language, types.ExecConfig{
 		// save this command later for the testing "node", "-e", "console.log('hello', typeof 1)"
-		Cmd:          []string{"php", "/tmp/test.php"},
+		Cmd:          []string{language, "/tmp/test." + language},
 		AttachStdin:  true,
 		AttachStdout: true,
 	})
