@@ -9,6 +9,6 @@ type ListOfContainers struct {
 }
 
 type Cases struct {
-	Input    any
-	Expected any
+	Input    any `json:"input"`
+	Expected any `json:"expected"`
 }

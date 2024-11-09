@@ -17,14 +17,14 @@ func DockerWriter(ctx context.Context, clt *client.Client) bytes.Buffer {
 	cases := []t.Cases{
 		{Input: []int{1, 2}, Expected: 3},
 	}
-	tarFile, err := utils.CreateTar("test.js", utils.InitTemplateJS("function sum(a,b){return a+b}", "sum", cases))
-	if err := clt.CopyToContainer(ctx, "goofy_rubin", "/tmp", tarFile, types.CopyToContainerOptions{}); err != nil {
+	tarFile, err := utils.CreateTar("test.php", utils.InitTemplatePhp("function sum($a,$b){return $a+$b;}", "sum", cases))
+	if err := clt.CopyToContainer(ctx, "php", "/tmp", tarFile, types.CopyToContainerOptions{}); err != nil {
 		panic(err)
 	}
 	//add, err := clt.CopyToContainer()
-	exec, err := clt.ContainerExecCreate(ctx, "goofy_rubin", types.ExecConfig{
+	exec, err := clt.ContainerExecCreate(ctx, "php", types.ExecConfig{
 		// save this command later for the testing "node", "-e", "console.log('hello', typeof 1)"
-		Cmd:          []string{"node", "/tmp/test.js"},
+		Cmd:          []string{"php", "/tmp/test.php"},
 		AttachStdin:  true,
 		AttachStdout: true,
 	})
