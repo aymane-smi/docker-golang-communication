@@ -13,18 +13,21 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 )
 
-func DockerWriter(ctx context.Context, clt *client.Client, language string) bytes.Buffer {
-	cases := []t.Cases{
-		{Input: []int{1, 2}, Expected: 3},
+func DockerWriter(ctx context.Context, clt *client.Client, body t.Body) bytes.Buffer {
+	// cases := []t.Cases{
+	// 	{Input: []int{1, 2}, Expected: 3},
+	// }
+	ext, err := utils.GenerateExt(body.Language)
+	if err != nil {
+		panic(err.Error())
 	}
-	tarFile, err := utils.CreateTar("test.php", utils.InitTemplatePhp("function sum($a,$b){return $a+$b;}", "sum", cases))
-	if err := clt.CopyToContainer(ctx, language, "/tmp", tarFile, types.CopyToContainerOptions{}); err != nil {
+	tarFile, err := utils.CreateTar("test"+ext, utils.InitTemplatePhp(body.Code, body.Name, body.TestCases))
+	if err := clt.CopyToContainer(ctx, body.Language, "/tmp", tarFile, types.CopyToContainerOptions{}); err != nil {
 		panic(err)
 	}
-	//add, err := clt.CopyToContainer()
-	exec, err := clt.ContainerExecCreate(ctx, language, types.ExecConfig{
+	exec, err := clt.ContainerExecCreate(ctx, body.Language, types.ExecConfig{
 		// save this command later for the testing "node", "-e", "console.log('hello', typeof 1)"
-		Cmd:          []string{language, "/tmp/test." + language},
+		Cmd:          []string{body.Language, "/tmp/test" + ext},
 		AttachStdin:  true,
 		AttachStdout: true,
 	})

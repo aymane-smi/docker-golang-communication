@@ -3,6 +3,7 @@ package utils
 import (
 	"archive/tar"
 	"bytes"
+	"errors"
 	"io"
 )
 
@@ -26,4 +27,16 @@ func CreateTar(filename string, code string) (io.Reader, error) {
 	defer tw.Close()
 	return buf, nil
 
+}
+
+func GenerateExt(language string) (string, error) {
+	if language == "php" {
+		return ".php", nil
+	} else if language == "javascript" {
+		return ".js", nil
+	} else if language == "java" {
+		return ".php", nil
+	} else {
+		return "", errors.New("langauge not supported")
+	}
 }

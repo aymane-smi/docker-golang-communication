@@ -20,7 +20,7 @@ func Handler(ctx context.Context, clt *client.Client) http.HandlerFunc {
 		if err != nil {
 			panic(err.Error())
 		}
-		buf := service.DockerWriter(ctx, clt, body.Language)
+		buf := service.DockerWriter(ctx, clt, body)
 		output := strings.TrimSpace(buf.String())
 		w.Write([]byte(output))
 	}

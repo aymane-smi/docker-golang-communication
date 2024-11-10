@@ -14,5 +14,8 @@ type Cases struct {
 }
 
 type Body struct {
-	Language string
+	Language  string
+	Code      string
+	TestCases []Cases `json:"TestCases"`
+	Name      string
 }
