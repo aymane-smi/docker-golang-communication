@@ -14,9 +14,6 @@ import (
 )
 
 func DockerWriter(ctx context.Context, clt *client.Client, body t.Body) bytes.Buffer {
-	// cases := []t.Cases{
-	// 	{Input: []int{1, 2}, Expected: 3},
-	// }
 	ext, err := utils.GenerateExt(body.Language)
 	if err != nil {
 		panic(err.Error())
@@ -42,22 +39,10 @@ func DockerWriter(ctx context.Context, clt *client.Client, body t.Body) bytes.Bu
 	}
 	defer attach.Close()
 
-	// output := make([]byte, 0)
-	// buffer := make([]byte, 1024)
 	var output, stderr bytes.Buffer
 	done := make(chan bool)
 
 	go func() {
-		// for {
-		// 	n, err := attach.Reader.Read(buffer)
-		// 	if n > 0 {
-		// 		output = append(output, buffer[:n]...)
-		// 	}
-		// 	if err != nil {
-		// 		done <- true
-		// 		return
-		// 	}
-		// }
 		stdcopy.StdCopy(&output, &stderr, attach.Reader)
 		done <- true
 	}()
