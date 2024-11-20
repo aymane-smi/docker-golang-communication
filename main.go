@@ -7,6 +7,7 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -18,5 +19,6 @@ func main() {
 	}
 	defer clt.Close()
 	r.HandleFunc("/docker", controller.Handler(ctx, clt)).Methods("POST")
-	http.ListenAndServe(":8008", r)
+	handler := cors.Default().Handler(r)
+	http.ListenAndServe(":8008", handler)
 }
