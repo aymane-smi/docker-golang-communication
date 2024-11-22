@@ -46,21 +46,29 @@ func GenerateExt(language string) (string, error) {
 	}
 }
 
-func CheckExistanceOfContainer(lang string, ctx context.Context, clt *client.Client) (error, bool) {
+func CheckExistanceOfContainer(lang string, ctx context.Context, clt *client.Client) (bool, error) {
 	list, err := clt.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
-		return err, false
+		return false, err
 	}
 	for _, container_ := range list {
 		join_str := strings.Join(container_.Names, "")
 		if join_str[1:] == lang {
-			return nil, true
+			return true, nil
 		}
 	}
-	return err, false
+	return false, err
 }
 
-func CheckStateOfConatiner(lang string, ctx context.Context, clt *client.Client) (error, bool) {
+func CheckStateOfContainer(lang string, ctx context.Context, clt *client.Client) (error, bool) {
 	json, err := clt.ContainerInspect(ctx, "php")
 	return err, json.State.Running
+}
+
+func StartContainer(lang string, ctx context.Context, clt *client.Client, counter *int64) error {
+	err := clt.ContainerStart(ctx, lang, container.StartOptions{})
+	if err == nil {
+		(*counter)++
+	}
+	return err
 }
