@@ -60,9 +60,9 @@ func CheckExistanceOfContainer(lang string, ctx context.Context, clt *client.Cli
 	return false, err
 }
 
-func CheckStateOfContainer(lang string, ctx context.Context, clt *client.Client) (error, bool) {
+func CheckStateOfContainer(lang string, ctx context.Context, clt *client.Client) (bool, error) {
 	json, err := clt.ContainerInspect(ctx, "php")
-	return err, json.State.Running
+	return json.State.Running, err
 }
 
 func StartContainer(lang string, ctx context.Context, clt *client.Client, counter *int64) error {

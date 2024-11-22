@@ -72,17 +72,20 @@ func DockerWriter(ctx context.Context, clt *client.Client, body t.Body) bytes.Bu
 // if not create one
 // finally run the containers(node-php)
 // it return the number of created container(it should be two [javascript , php]) + the error if existe
-func CreateContainers(ctx context.Context, clt *client.Client) (int64, error) {
+func CreateContainers(ctx context.Context, clt *client.Client) (int64, [2]error) {
+
 	ArrOfLang := []string{"javascript", "php"}
+	//counter is a variable that store the number of runned container after executing this method
 	var counter int64 = 0
 	var imageName string
-	//i should handle the case of the err where it should be a global variable and return it only at the end of the function
-	for _, lang := range ArrOfLang {
+	errors := [2]error{nil, nil}
+
+	for index, lang := range ArrOfLang {
 		result, err := utils.CheckExistanceOfContainer(lang, ctx, clt)
 		if err != nil {
-			return counter, err
+			errors[index] = err
 		} else if result == false {
-			//the container doesn't existe then create a new one and started
+			//if the container doesn't existe then create a new one and started
 			if lang == "javascript" {
 				imageName = "node:alpine"
 			} else {
@@ -90,11 +93,13 @@ func CreateContainers(ctx context.Context, clt *client.Client) (int64, error) {
 			}
 			reader, err := clt.ImagePull(ctx, imageName, image.PullOptions{})
 			if err != nil {
-				return counter, err
+				errors[index] = err
+				break
 			}
 			io.Copy(io.Discard, reader)
 			res, err := clt.ContainerCreate(ctx, &container.Config{
 				Image: imageName,
+				Cmd:   []string{"tail", "-f", "/dev/null"}, //using this command to prevent the container from stopping after the finish of the run
 			}, &container.HostConfig{
 				Resources: container.Resources{
 					Memory:    int64(128 * 1024 * 1024), //for now i'm using 128 mb for memory after that we can see a better strategy
@@ -103,17 +108,34 @@ func CreateContainers(ctx context.Context, clt *client.Client) (int64, error) {
 				},
 			}, nil, nil, lang)
 			if err != nil {
-				return counter, err
+				errors[index] = err
+				break
 			}
 			if err := utils.StartContainer(res.ID, ctx, clt, &counter); err != nil {
-				return counter, err
+				errors[index] = err
+				break
 			}
 			//handling the case of the existance of the container
 			//now check if the container is started
-			//if now just started
+			//if no just started
+			//the implementation it can be changed later
 		} else {
+			state, err := utils.CheckStateOfContainer(lang, ctx, clt)
+			if err != nil {
+				errors[index] = err
+				break
+			} else if state {
+				counter++
+			} else if !state {
+				//if the container is stopped try to started
+				//if there is any error during the launch handle the error
+				if err := utils.StartContainer(lang, ctx, clt, &counter); err != nil {
+					errors[index] = err
+					break
+				}
+			}
 
 		}
 	}
-	return counter, nil
+	return counter, errors
 }

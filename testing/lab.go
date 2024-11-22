@@ -1,7 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"aymane/service"
+	"context"
+	"fmt"
+
+	"github.com/docker/docker/client"
+)
 
 func main() {
-	fmt.Println("hello")
+	ctx := context.Background()
+	clt, _ := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	fmt.Println(service.CreateContainers(ctx, clt))
 }
