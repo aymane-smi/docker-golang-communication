@@ -3,8 +3,13 @@ package utils
 import (
 	"archive/tar"
 	"bytes"
+	"context"
 	"errors"
 	"io"
+	"strings"
+
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/client"
 )
 
 func CreateTar(filename string, code string) (io.Reader, error) {
@@ -39,4 +44,23 @@ func GenerateExt(language string) (string, error) {
 	} else {
 		return "", errors.New("langauge not supported")
 	}
+}
+
+func CheckExistanceOfContainer(lang string, ctx context.Context, clt *client.Client) (error, bool) {
+	list, err := clt.ContainerList(ctx, container.ListOptions{All: true})
+	if err != nil {
+		return err, false
+	}
+	for _, container_ := range list {
+		join_str := strings.Join(container_.Names, "")
+		if join_str[1:] == lang {
+			return nil, true
+		}
+	}
+	return err, false
+}
+
+func CheckStateOfConatiner(lang string, ctx context.Context, clt *client.Client) (error, bool) {
+	json, err := clt.ContainerInspect(ctx, "php")
+	return err, json.State.Running
 }

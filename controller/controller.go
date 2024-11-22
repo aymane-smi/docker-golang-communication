@@ -14,7 +14,6 @@ import (
 // using colsure to fix this probelm of extra params using mux
 func Handler(ctx context.Context, clt *client.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//utils.EnableCors(&w)
 		var body t.Body
 		w.Header().Set("Content-Type", "application/json")
 		err := json.NewDecoder(r.Body).Decode(&body)

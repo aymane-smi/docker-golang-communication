@@ -3,6 +3,7 @@ package main
 import (
 	"aymane/controller"
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/docker/docker/client"
@@ -20,5 +21,6 @@ func main() {
 	defer clt.Close()
 	r.HandleFunc("/docker", controller.Handler(ctx, clt)).Methods("POST")
 	handler := cors.Default().Handler(r)
+	fmt.Println("server started at port 8008")
 	http.ListenAndServe(":8008", handler)
 }

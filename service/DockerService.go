@@ -65,6 +65,10 @@ func DockerWriter(ctx context.Context, clt *client.Client, body t.Body) bytes.Bu
 	return output
 }
 
+//check if the containers exist
+//if not create one
+//finally run the containers(node-php)
+
 func CreateContainers() {
 
 }
