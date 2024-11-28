@@ -3,8 +3,18 @@ package utils
 import (
 	"archive/tar"
 	"bytes"
+<<<<<<< Updated upstream
 	"errors"
 	"io"
+=======
+	"context"
+	"errors"
+	"io"
+	"strings"
+
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/client"
+>>>>>>> Stashed changes
 )
 
 func CreateTar(filename string, code string) (io.Reader, error) {
@@ -40,3 +50,33 @@ func GenerateExt(language string) (string, error) {
 		return "", errors.New("langauge not supported")
 	}
 }
+<<<<<<< Updated upstream
+=======
+
+func CheckExistanceOfContainer(lang string, ctx context.Context, clt *client.Client) (bool, error) {
+	list, err := clt.ContainerList(ctx, container.ListOptions{All: true})
+	if err != nil {
+		return false, err
+	}
+	for _, container_ := range list {
+		join_str := strings.Join(container_.Names, "")
+		if join_str[1:] == lang {
+			return true, nil
+		}
+	}
+	return false, err
+}
+
+func CheckStateOfContainer(lang string, ctx context.Context, clt *client.Client) (bool, error) {
+	json, err := clt.ContainerInspect(ctx, "php")
+	return json.State.Running, err
+}
+
+func StartContainer(lang string, ctx context.Context, clt *client.Client, counter *int64) error {
+	err := clt.ContainerStart(ctx, lang, container.StartOptions{})
+	if err == nil {
+		(*counter)++
+	}
+	return err
+}
+>>>>>>> Stashed changes
