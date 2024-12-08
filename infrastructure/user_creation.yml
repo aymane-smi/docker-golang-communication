@@ -1,0 +1,15 @@
+---
+- name: Setup user for the vps
+  hosts: vps
+  become: true
+  tasks:
+    - name: Generate password hash
+      ansible.builtin.set_fact:
+        password_hash: "{{ password | password_hash('sha512') }}"
+    - name: Create user 'aymane'
+      user:
+        name: aymane
+        state: present
+        group: sudo
+        shell: /bin/bash
+        password: "{{ password_hash }}"

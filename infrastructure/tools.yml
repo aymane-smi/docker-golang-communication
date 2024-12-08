@@ -1,0 +1,28 @@
+---
+- name: Install development tools
+  hosts: vps
+  become: true
+  tasks:
+    - name: Update package list
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        name: docker.io
+        state: present
+
+    - name: Install Node.js
+      ansible.builtin.apt:
+        name: nodejs
+        state: present
+
+    - name: Install npm (Node Package Manager)
+      ansible.builtin.apt:
+        name: npm
+        state: present
+
+    - name: Install Go programming language
+      ansible.builtin.apt:
+        name: golang
+        state: present
