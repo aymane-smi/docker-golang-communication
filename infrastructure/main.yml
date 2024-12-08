@@ -1,2 +1,3 @@
 ---
+- import_playbook: tools.yml
 - import_playbook: user_creation.yml
